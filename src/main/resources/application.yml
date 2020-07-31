@@ -1,0 +1,63 @@
+server:
+  port: 8183
+
+domain:
+  payment:
+    name: payment
+
+spring:
+  application:
+    name: awesome-payment-service
+  datasource:
+    platform: h2
+    url: jdbc:h2:mem:testdb;
+    username: sa
+    password: null
+    driver-class-name: org.h2.Driver
+    initialization-mode: always
+  h2:
+    console:
+      enabled: true
+  cloud:
+    stream:
+      rabbit:
+        bindings:
+          orderCanceled:
+            consumer:
+              autoBindDlq: true
+              bindingRoutingKey: order.OrderCanceled.#
+          orderCreated:
+            consumer:
+              autoBindDlq: true
+              bindingRoutingKey: order.OrderCreated.#
+          paymentOutput:
+            producer:
+              routing-key-expression: headers['routeTo']
+      binders:
+        rabbitmq:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: 34.211.184.139
+                port: 5672
+                username: labs
+                password: awesome-rabbitmq
+      bindings:
+        orderCanceled:
+          destination: orderExchange
+          group: payment.orderCanceled
+          content-type: application/json
+        orderCreated:
+          destination: orderExchange
+          group: payment.orderCreated
+          content-type: application/json
+        paymentOutput:
+          destination: paymentExchange
+          content-type: application/json
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+        - "*"
