@@ -1,0 +1,58 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: payment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment
+  template:
+    metadata:
+      labels:
+        app: payment
+    spec:
+      containers:
+        - name: payment
+          image: registry.localtest.com/payment:1.1
+          ports:
+            - containerPort: 8183
+      hostAliases:
+      - ip: "20.194.18.209"
+        hostnames:
+        - "account.skcc.co.kr"
+        - "apigateway.skcc.co.kr"
+        - "bff.skcc.co.kr"
+        - "cart.skcc.co.kr"
+        - "order.skcc.co.kr"
+        - "payment.skcc.co.kr"
+        - "product.skcc.co.kr"
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: payment-ingress
+spec:
+  rules:
+  - host: payment.skcc.co.kr
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: payment-svc
+          servicePort: 8183
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-svc
+  labels:
+    app: payment
+spec:
+  ports:
+    - port: 8183
+      targetPort: 8183
+      name: payment-svc
+  selector:
+    app: payment
