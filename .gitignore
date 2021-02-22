@@ -16,6 +16,9 @@
 *.iml
 *.ipr
 
+### VS Code ###
+launch.json
+
 ### NetBeans ###
 /nbproject/private/
 /build/
