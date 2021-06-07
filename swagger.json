@@ -1,0 +1,246 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "payment API",
+    "version": "1.0",
+    "title": "payment",
+    "termsOfService": "urn:tos",
+    "contact": {
+      
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "host": "localhost:8183",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "payment-controller",
+      "description": "Payment Controller"
+    }
+  ],
+  "paths": {
+    "/v1/payments": {
+      "get": {
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "uri": "http://a1001c0e806a748679deb2115e1930bf-0f412fe779c96488.elb.ap-northeast-2.amazonaws.com/v1/payments",
+          "passthroughBehavior": "when_no_match",
+          "connectionType": "VPC_LINK",
+          "connectionId": "vwdm61",
+          "httpMethod": "GET",
+          "type": "http_proxy"
+        },
+        "tags": [
+          "payment-controller"
+        ],
+        "summary": "findPaymentByAccountID",
+        "operationId": "findPaymentByAccountIDUsingGET",
+
+        "parameters": [
+          {
+            "in": "body",
+            "name": "accountId",
+            "description": "accountId",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Payment"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/v1/payments/events": {
+      "get": {
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "uri": "http://a1001c0e806a748679deb2115e1930bf-0f412fe779c96488.elb.ap-northeast-2.amazonaws.com/v1/payments/events",
+          "passthroughBehavior": "when_no_match",
+          "connectionType": "VPC_LINK",
+          "connectionId": "vwdm61",
+          "httpMethod": "GET",
+          "type": "http_proxy"
+        },
+        "tags": [
+          "payment-controller"
+        ],
+        "summary": "getPaymentEvent",
+        "operationId": "getPaymentEventUsingGET",
+
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PaymentEvent"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "definitions": {
+    "Payment": {
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "active": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "orderId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "paid": {
+          "type": "string"
+        },
+        "paymentDetail1": {
+          "type": "string"
+        },
+        "paymentDetail2": {
+          "type": "string"
+        },
+        "paymentDetail3": {
+          "type": "string"
+        },
+        "paymentMethod": {
+          "type": "string"
+        },
+        "price": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "Payment"
+    },
+    "PaymentEvent": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "eventType": {
+          "type": "string",
+          "enum": [
+            "PaymentCreated",
+            "PaymentCanceled",
+            "PaymentCreateFailed",
+            "PaymentCancelFailed"
+          ]
+        },
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "payload": {
+          "$ref": "#/definitions/PaymentPayload"
+        },
+        "paymentId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "txId": {
+          "type": "string"
+        }
+      },
+      "title": "PaymentEvent"
+    },
+    "PaymentPayload": {
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "active": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "orderId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "paid": {
+          "type": "string"
+        },
+        "paymentDetail1": {
+          "type": "string"
+        },
+        "paymentDetail2": {
+          "type": "string"
+        },
+        "paymentDetail3": {
+          "type": "string"
+        },
+        "paymentMethod": {
+          "type": "string"
+        },
+        "price": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "PaymentPayload"
+    }
+  }
+}
