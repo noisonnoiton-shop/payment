@@ -64,7 +64,7 @@
 	</select>
 	
 	<select id="getPaymentEventId" resultType="long">
-		select event_seq.nextval;
+		select ${sequence-nextval};
 	</select>
 	
 	<insert id="createPaymentEvent" parameterMap="PaymentEvent">

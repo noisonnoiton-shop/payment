@@ -1,4 +1,5 @@
 --sequence
+drop sequence if EXISTS event_seq;
 create sequence event_seq;
 
 -- products
