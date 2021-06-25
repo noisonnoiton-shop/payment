@@ -2,16 +2,15 @@ package com.skcc.payment.controller;
 
 import java.util.List;
 
-import javax.websocket.server.PathParam;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.skcc.payment.domain.Payment;
 import com.skcc.payment.event.message.PaymentEvent;
 import com.skcc.payment.service.PaymentService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1")
@@ -24,8 +23,8 @@ public class PaymentController {
 		this.paymentService = paymentService;
 	}
 	
-	@GetMapping(value="/payments")
-	public List<Payment> findPaymentByAccountID(@PathParam(value="accountId") long accountId) {
+	@GetMapping(value="/payments/{accountId}")
+	public List<Payment> findPaymentByAccountID(@PathVariable long accountId) {
 		return paymentService.findPaymentByAccountId(accountId);
 	}
 	
