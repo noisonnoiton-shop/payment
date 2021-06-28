@@ -1,8 +1,16 @@
 package com.skcc.payment.service;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import com.skcc.order.event.message.OrderEvent;
+import com.skcc.payment.domain.Payment;
+import com.skcc.payment.event.message.PaymentEvent;
+import com.skcc.payment.event.message.PaymentEventType;
+import com.skcc.payment.event.message.PaymentPayload;
+import com.skcc.payment.publish.PaymentPublish;
+import com.skcc.payment.repository.PaymentEventRepository;
+import com.skcc.payment.repository.PaymentRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,18 +19,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.skcc.order.event.message.OrderEvent;
-import com.skcc.payment.domain.Payment;
-import com.skcc.payment.event.message.PaymentEvent;
-import com.skcc.payment.event.message.PaymentEventType;
-import com.skcc.payment.event.message.PaymentPayload;
-import com.skcc.payment.publish.PaymentPublish;
-import com.skcc.payment.repository.PaymentMapper;
-
 @Service
 public class PaymentService {
 
-	private PaymentMapper paymentMapper;
+	// @Autowired
+	// private PaymentMapper paymentMapper;
+
+	private PaymentRepository paymentRepository;
+	private PaymentEventRepository paymentEventRepository;
 	private PaymentPublish paymentPublish;
 	
 	@Autowired
@@ -35,8 +39,9 @@ public class PaymentService {
 
 	
 	@Autowired
-	public PaymentService(PaymentMapper paymentMapper, PaymentPublish paymentPublish) {
-		this.paymentMapper = paymentMapper;
+	public PaymentService(PaymentRepository paymentRepository, PaymentEventRepository paymentEventRepository, PaymentPublish paymentPublish) {
+		this.paymentRepository = paymentRepository;
+		this.paymentEventRepository = paymentEventRepository;
 		this.paymentPublish = paymentPublish;
 	}
 	
@@ -105,7 +110,9 @@ public class PaymentService {
     }
 	
 	public void cancelPayment(Payment payment) {
-		this.paymentMapper.cancelPayment(payment);
+		// this.paymentMapper.cancelPayment(payment);
+		payment.setActive("inactive");
+		this.paymentRepository.save(payment);
 	}
 	
 	public void cancelPaymentValidationCheck(Payment payment) throws Exception {
@@ -116,7 +123,8 @@ public class PaymentService {
 	}
 
 	public Payment createPayment(Payment payment) {
-		this.paymentMapper.createPayment(payment);
+		// this.paymentMapper.createPayment(payment);
+		this.paymentRepository.save(payment);
 		return payment;
 	}
 	
@@ -126,8 +134,9 @@ public class PaymentService {
 		this.publishPaymentEvent(paymentEvent);
 	}
 	
-	public void createPaymentEvent(PaymentEvent paymentevent) {
-		this.paymentMapper.createPaymentEvent(paymentevent);
+	public void createPaymentEvent(PaymentEvent paymentEvent) {
+		// this.paymentMapper.createPaymentEvent(paymentEvent);
+		this.paymentEventRepository.save(paymentEvent);
 	}
 	
 	public void publishPaymentEvent(PaymentEvent paymentEvent) {
@@ -135,15 +144,13 @@ public class PaymentService {
 	}
 	
 	public Payment findById(long id) {
-		return this.paymentMapper.findById(id);
-	}
-	
-	public long getPaymentEventId() {
-		return this.paymentMapper.getPaymentEventId();
+		// return this.paymentMapper.findById(id);
+		return this.paymentRepository.findById(id);
 	}
 	
 	public List<Payment> findPaymentByAccountId(long accountId) {
-		return this.paymentMapper.findPaymentByAccountId(accountId); 
+		// return this.paymentMapper.findPaymentByAccountId(accountId);
+		return this.paymentRepository.findPaymentByAccountId(accountId);
 	}
 	
 	public Payment convertOrderEventToPayment(OrderEvent orderEvent) {
@@ -189,13 +196,13 @@ public class PaymentService {
 			payment = this.findById(id);
 		
 		PaymentEvent paymentEvent = new PaymentEvent();
-		paymentEvent.setId(this.getPaymentEventId());
+		// paymentEvent.setId(this.getPaymentEventId());
 		paymentEvent.setPaymentId(id);
 		paymentEvent.setDomain(domain);
 		paymentEvent.setEventType(paymentEventType);
 		paymentEvent.setPayload(new PaymentPayload(payment.getId(), payment.getAccountId(), payment.getOrderId(), payment.getPaymentMethod(), payment.getPaymentDetail1(), payment.getPaymentDetail2(), payment.getPaymentDetail3(), payment.getPrice(), payment.getPaid(), payment.getActive()));
 		paymentEvent.setTxId(txId);
-		paymentEvent.setCreatedAt(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
+		paymentEvent.setCreatedAt(LocalDateTime.now());
 		
 		log.info("in service paymentEvent : {}", paymentEvent.toString());
 		
@@ -212,20 +219,22 @@ public class PaymentService {
 	}
 	
 	public Payment findUnpaidPaymentById(long id) {
-		Payment payment = this.paymentMapper.findunPaidPaymentById(id);
-		return payment;
+		// return this.paymentMapper.findunPaidPaymentById(id);
+		return this.paymentRepository.findPaymentByIdAndPaid(id, "unpaid");
 	}
 	
 	public Payment findPaymentByOrderId(long orderId) {
-		return this.paymentMapper.findPaymentByOrderId(orderId);
+		// return this.paymentMapper.findPaymentByOrderId(orderId);
+		return this.paymentRepository.findPaymentByOrderId(orderId);
 	}
 	
-	public PaymentEvent findPreviousPaymentEvent(String txId, long paymentId) {
-		return this.paymentMapper.findPreviousPaymentEvent(txId, paymentId);
-	}
+	// public PaymentEvent findPreviousPaymentEvent(String txId, long paymentId) {
+	// 	return this.paymentMapper.findPreviousPaymentEvent(txId, paymentId);
+	// }
 	
 	public List<PaymentEvent> getPaymentEvent() {
-		return this.paymentMapper.getPaymentEvent();
+		// return this.paymentMapper.getPaymentEvent();
+		return this.paymentEventRepository.findAll();
 	}
 	
 }

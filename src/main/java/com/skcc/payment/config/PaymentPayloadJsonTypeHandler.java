@@ -2,19 +2,18 @@ package com.skcc.payment.config;
 
 import java.io.IOException;
 import java.sql.CallableStatement;
-import java.sql.Clob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import org.apache.ibatis.type.BaseTypeHandler;
-import org.apache.ibatis.type.JdbcType;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skcc.payment.event.message.PaymentPayload;
+
+import org.apache.ibatis.type.BaseTypeHandler;
+import org.apache.ibatis.type.JdbcType;
 
 public class PaymentPayloadJsonTypeHandler extends BaseTypeHandler<Object>{
 
@@ -52,22 +51,6 @@ public class PaymentPayloadJsonTypeHandler extends BaseTypeHandler<Object>{
 		}
 		
 		return cp;
-//		Object d = rs.getObject(columnName);
-//		if(d == null) return null;
-//		
-//		List<PaymentPayload> cps = null;
-//		ObjectMapper objectMapper = new ObjectMapper();
-//		try {
-//			cps = objectMapper.readValue(d.toString(), new TypeReference<List<PaymentPayload>>() {});
-//		} catch (JsonParseException e) {
-//			e.printStackTrace();
-//		} catch (JsonMappingException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		return cps;
 		
 	}
 
