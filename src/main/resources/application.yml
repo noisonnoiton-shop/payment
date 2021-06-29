@@ -41,19 +41,6 @@ spring:
 
   cloud:
     stream:
-      rabbit:
-        bindings:
-          orderCanceled:
-            consumer:
-              autoBindDlq: true
-              bindingRoutingKey: order.OrderCanceled.#
-          orderCreated:
-            consumer:
-              autoBindDlq: true
-              bindingRoutingKey: order.OrderCreated.#
-          paymentOutput:
-            producer:
-              routing-key-expression: headers['routeTo']
       binders:
         rabbitmq:
           type: rabbit
@@ -77,6 +64,20 @@ spring:
         paymentOutput:
           destination: paymentExchange
           content-type: application/json
+      rabbit:
+        bindings:
+          orderCanceled:
+            consumer:
+              autoBindDlq: true
+              bindingRoutingKey: order.OrderCanceled.#
+          orderCreated:
+            consumer:
+              autoBindDlq: true
+              bindingRoutingKey: order.OrderCreated.#
+          paymentOutput:
+            producer:
+              routing-key-expression: headers['routeTo']
+
 management:
   endpoints:
     web:
