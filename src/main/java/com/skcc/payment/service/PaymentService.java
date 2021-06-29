@@ -124,7 +124,7 @@ public class PaymentService {
 
 	public Payment createPayment(Payment payment) {
 		// this.paymentMapper.createPayment(payment);
-		this.paymentRepository.save(payment);
+		payment = this.paymentRepository.save(payment);
 		return payment;
 	}
 	
