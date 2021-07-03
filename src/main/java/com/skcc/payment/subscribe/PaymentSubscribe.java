@@ -1,5 +1,6 @@
 package com.skcc.payment.subscribe;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.skcc.order.event.message.OrderEvent;
 import com.skcc.payment.event.channel.PaymentInputChannel;
 import com.skcc.payment.service.PaymentService;
@@ -10,6 +11,7 @@ import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.stereotype.Component;
 
 @Component
+@XRayEnabled
 @EnableBinding(PaymentInputChannel.class)
 public class PaymentSubscribe {
 
