@@ -11,7 +11,7 @@ import com.skcc.payment.event.channel.PaymentOutputChannel;
 import com.skcc.payment.event.message.PaymentEvent;
 
 @Component
-@XRayEnabled
+// @XRayEnabled
 @EnableBinding(PaymentOutputChannel.class)
 public class PaymentPublish {
 	
