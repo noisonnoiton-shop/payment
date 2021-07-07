@@ -9,6 +9,7 @@ import com.skcc.payment.domain.Payment;
 import com.skcc.payment.event.message.PaymentEvent;
 import com.skcc.payment.event.message.PaymentEventType;
 import com.skcc.payment.event.message.PaymentPayload;
+import com.skcc.payment.producer.PaymentProducer;
 import com.skcc.payment.publish.PaymentPublish;
 import com.skcc.payment.repository.PaymentEventRepository;
 import com.skcc.payment.repository.PaymentRepository;
@@ -20,8 +21,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 // @XRayEnabled
+@Slf4j
 public class PaymentService {
 
 	// @Autowired
@@ -29,22 +33,21 @@ public class PaymentService {
 
 	private PaymentRepository paymentRepository;
 	private PaymentEventRepository paymentEventRepository;
-	private PaymentPublish paymentPublish;
 	
 	@Autowired
 	private PaymentService paymentService;
+
+	@Autowired
+	private PaymentProducer paymentProducer;
 	
-	@Value("${domain.payment.name}")
+	
+	@Value("${domain.name}")
 	String domain;
 	
-	private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
-
-	
 	@Autowired
-	public PaymentService(PaymentRepository paymentRepository, PaymentEventRepository paymentEventRepository, PaymentPublish paymentPublish) {
+	public PaymentService(PaymentRepository paymentRepository, PaymentEventRepository paymentEventRepository) {
 		this.paymentRepository = paymentRepository;
 		this.paymentEventRepository = paymentEventRepository;
-		this.paymentPublish = paymentPublish;
 	}
 	
 	public boolean createPaymentAndCreatePublishEvent(OrderEvent orderEvent) {
@@ -142,7 +145,8 @@ public class PaymentService {
 	}
 	
 	public void publishPaymentEvent(PaymentEvent paymentEvent) {
-		this.paymentPublish.send(paymentEvent);
+		// this.paymentPublish.send(paymentEvent);
+		this.paymentProducer.send(paymentEvent);
 	}
 	
 	public Payment findById(long id) {

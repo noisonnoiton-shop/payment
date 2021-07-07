@@ -10,9 +10,8 @@ import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.stereotype.Component;
 
-@Component
-// @XRayEnabled
-@EnableBinding(PaymentInputChannel.class)
+// @Component
+// @EnableBinding(PaymentInputChannel.class)
 public class PaymentSubscribe {
 
 	private PaymentService paymentService;
@@ -22,12 +21,12 @@ public class PaymentSubscribe {
 		this.paymentService = paymentService;
 	}
 	
-	@StreamListener(PaymentInputChannel.orderCreated)
+	// @StreamListener(PaymentInputChannel.orderCreated)
 	public void receiveOrderCreatedEvent(OrderEvent orderEvent) {
 	    this.paymentService.createPaymentAndCreatePublishEvent(orderEvent);
 	}
 	
-	@StreamListener(PaymentInputChannel.orderCanceled)
+	// @StreamListener(PaymentInputChannel.orderCanceled)
 	public void receiveOrderCanceledEvent(OrderEvent orderEvent) {
 	    this.paymentService.cancelPaymentAndCreatePublishEvent(orderEvent);
 	}

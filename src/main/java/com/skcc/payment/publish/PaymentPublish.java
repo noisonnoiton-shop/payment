@@ -10,14 +10,13 @@ import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.skcc.payment.event.channel.PaymentOutputChannel;
 import com.skcc.payment.event.message.PaymentEvent;
 
-@Component
-// @XRayEnabled
-@EnableBinding(PaymentOutputChannel.class)
+// @Component
+// @EnableBinding(PaymentOutputChannel.class)
 public class PaymentPublish {
 	
 	private PaymentOutputChannel paymentOutputChannel;
 	
-	@Value("${domain.payment.name}")
+	@Value("${domain.name}")
 	private String domain;
 	
 	@Autowired

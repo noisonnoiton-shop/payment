@@ -7,10 +7,10 @@ public interface PaymentInputChannel {
 	String orderCreated = "orderCreated";
 	String orderCanceled = "orderCanceled";
 	
-	@Input(PaymentInputChannel.orderCanceled)
+	// @Input(PaymentInputChannel.orderCanceled)
 	SubscribableChannel orderCanceled();
  	
-	@Input(PaymentInputChannel.orderCreated)
+	// @Input(PaymentInputChannel.orderCreated)
 	SubscribableChannel orderCreated();
 
 }

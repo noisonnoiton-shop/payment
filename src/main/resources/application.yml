@@ -2,8 +2,7 @@ server:
   port: 8183
 
 domain:
-  payment:
-    name: payment
+  name: payment
 
 mybatis:
   config-location: mybatis-config-h2.xml
@@ -46,44 +45,60 @@ spring:
   #   initialization-mode: always
   #   continue-on-error: true
 
+  rabbitmq:
+    addresses: localhost
+    username: labs
+    password: awesome-rabbitmq
   cloud:
     stream:
-      binders:
-        rabbitmq:
-          type: rabbit
-          environment:
-            spring:
-              rabbitmq:
-                #host: rabbitmq
-                host: localhost
-                port: 5672
-                username: labs
-                password: awesome-rabbitmq
       bindings:
-        orderCanceled:
-          destination: orderExchange
-          group: payment.orderCanceled
-          content-type: application/json
-        orderCreated:
-          destination: orderExchange
-          group: payment.orderCreated
-          content-type: application/json
         paymentOutput:
-          destination: paymentExchange
+          destination: paymentTopic
           content-type: application/json
       rabbit:
         bindings:
-          orderCanceled:
-            consumer:
-              autoBindDlq: true
-              bindingRoutingKey: order.OrderCanceled.#
-          orderCreated:
-            consumer:
-              autoBindDlq: true
-              bindingRoutingKey: order.OrderCreated.#
           paymentOutput:
             producer:
               routing-key-expression: headers['routeTo']
+
+  # cloud:
+  #   stream:
+  #     binders:
+  #       rabbitmq:
+  #         type: rabbit
+  #         environment:
+  #           spring:
+  #             rabbitmq:
+  #               #host: rabbitmq
+  #               host: localhost
+  #               port: 5672
+  #               username: labs
+  #               password: awesome-rabbitmq
+  #     bindings:
+  #       orderCanceled:
+  #         destination: orderExchange
+  #         group: payment.orderCanceled
+  #         content-type: application/json
+  #       orderCreated:
+  #         destination: orderExchange
+  #         group: payment.orderCreated
+  #         content-type: application/json
+  #       paymentOutput:
+  #         destination: paymentExchange
+  #         content-type: application/json
+  #     rabbit:
+  #       bindings:
+  #         orderCanceled:
+  #           consumer:
+  #             autoBindDlq: true
+  #             bindingRoutingKey: order.OrderCanceled.#
+  #         orderCreated:
+  #           consumer:
+  #             autoBindDlq: true
+  #             bindingRoutingKey: order.OrderCreated.#
+  #         paymentOutput:
+  #           producer:
+  #             routing-key-expression: headers['routeTo']
 
 management:
   endpoints:
