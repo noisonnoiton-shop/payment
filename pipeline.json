@@ -20,7 +20,7 @@
                         },
                         "runOrder": 1,
                         "configuration": {
-                            "BranchName": "eks",
+                            "BranchName": "dev",
                             "OutputArtifactFormat": "CODE_ZIP",
                             "PollForSourceChanges": "false",
                             "RepositoryName": "payment"
