@@ -1,0 +1,211 @@
+{
+    "pipeline": {
+        "name": "payment-devsecops",
+        "roleArn": "arn:aws:iam::170247361816:role/container-devsecops-wksp-codepipeline-service",
+        "artifactStore": {
+            "type": "S3",
+            "location": "container-devsecops-wksp-170247361816-ap-northeast-2-artifacts"
+        },
+        "stages": [
+            {
+                "name": "PullRequest",
+                "actions": [
+                    {
+                        "name": "AppSource",
+                        "actionTypeId": {
+                            "category": "Source",
+                            "owner": "AWS",
+                            "provider": "CodeCommit",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "BranchName": "eks",
+                            "OutputArtifactFormat": "CODE_ZIP",
+                            "PollForSourceChanges": "false",
+                            "RepositoryName": "payment"
+                        },
+                        "outputArtifacts": [
+                            {
+                                "name": "AppSource"
+                            }
+                        ],
+                        "inputArtifacts": [],
+                        "region": "ap-northeast-2"
+                    },
+                    {
+                        "name": "ConfigSource",
+                        "actionTypeId": {
+                            "category": "Source",
+                            "owner": "AWS",
+                            "provider": "CodeCommit",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "BranchName": "master",
+                            "OutputArtifactFormat": "CODE_ZIP",
+                            "PollForSourceChanges": "false",
+                            "RepositoryName": "container-devsecops-wksp-config"
+                        },
+                        "outputArtifacts": [
+                            {
+                                "name": "ConfigSource"
+                            }
+                        ],
+                        "inputArtifacts": [],
+                        "region": "ap-northeast-2"
+                    }
+                ]
+            },
+            {
+                "name": "StaticAnalysis-DockerfileConfiguration",
+                "actions": [
+                    {
+                        "name": "Validation",
+                        "actionTypeId": {
+                            "category": "Build",
+                            "owner": "AWS",
+                            "provider": "CodeBuild",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "PrimarySource": "ConfigSource",
+                            "ProjectName": "container-devsecops-wksp-build-dockerfile"
+                        },
+                        "outputArtifacts": [
+                            {
+                                "name": "DFAppSourceOutput"
+                            },
+                            {
+                                "name": "DFConfigSourceOutput"
+                            }
+                        ],
+                        "inputArtifacts": [
+                            {
+                                "name": "AppSource"
+                            },
+                            {
+                                "name": "ConfigSource"
+                            }
+                        ],
+                        "region": "ap-northeast-2"
+                    }
+                ]
+            },
+            {
+                "name": "StaticAnalysis-Secrets",
+                "actions": [
+                    {
+                        "name": "Validation",
+                        "actionTypeId": {
+                            "category": "Build",
+                            "owner": "AWS",
+                            "provider": "CodeBuild",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "EnvironmentVariables": "[{\"name\":\"APP_REPO_URL\",\"value\":\"https://git-codecommit.ap-northeast-2.amazonaws.com/v1/repos/payment\",\"type\":\"PLAINTEXT\"}]",
+                            "PrimarySource": "ConfigSource",
+                            "ProjectName": "container-devsecops-wksp-build-secrets"
+                        },
+                        "outputArtifacts": [
+                            {
+                                "name": "SecretsAppSourceOutput"
+                            },
+                            {
+                                "name": "SecretsConfigSourceOutput"
+                            }
+                        ],
+                        "inputArtifacts": [
+                            {
+                                "name": "AppSource"
+                            },
+                            {
+                                "name": "ConfigSource"
+                            }
+                        ],
+                        "region": "ap-northeast-2"
+                    }
+                ]
+            },
+            {
+                "name": "VulnerabilityAnalysis",
+                "actions": [
+                    {
+                        "name": "VulnerabilityScan",
+                        "actionTypeId": {
+                            "category": "Build",
+                            "owner": "AWS",
+                            "provider": "CodeBuild",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "EnvironmentVariables": "[{\"name\":\"IMAGE_ARN\",\"value\":\"arn:aws:ecr:ap-northeast-2:170247361816:repository/shop/payment\",\"type\":\"PLAINTEXT\"},{\"name\":\"APP_NAME\",\"value\":\"payment\",\"type\":\"PLAINTEXT\"}]",
+                            "PrimarySource": "ConfigSource",
+                            "ProjectName": "container-devsecops-wksp-scan-image"
+                        },
+                        "outputArtifacts": [
+                            {
+                                "name": "VulnAppSourceOutput"
+                            },
+                            {
+                                "name": "VulnConfigSourceOutput"
+                            }
+                        ],
+                        "inputArtifacts": [
+                            {
+                                "name": "AppSource"
+                            },
+                            {
+                                "name": "ConfigSource"
+                            }
+                        ],
+                        "region": "ap-northeast-2"
+                    }
+                ]
+            },
+            {
+                "name": "PublishImage",
+                "actions": [
+                    {
+                        "name": "Build",
+                        "actionTypeId": {
+                            "category": "Build",
+                            "owner": "AWS",
+                            "provider": "CodeBuild",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "EnvironmentVariables": "[{\"name\":\"IMAGE_REPO_NAME\",\"value\":\"shop/payment\",\"type\":\"PLAINTEXT\"},{\"name\":\"AWS_ACCOUNT_ID\",\"value\":\"170247361816\",\"type\":\"PLAINTEXT\"},{\"name\":\"AWS_DEFAULT_REGION\",\"value\":\"ap-northeast-2\",\"type\":\"PLAINTEXT\"},{\"name\":\"APP_NAME\",\"value\":\"payment\",\"type\":\"PLAINTEXT\"}]",
+                            "PrimarySource": "ConfigSource",
+                            "ProjectName": "container-devsecops-wksp-publish"
+                        },
+                        "outputArtifacts": [
+                            {
+                                "name": "PushAppSourceOutput"
+                            },
+                            {
+                                "name": "PushConfigSourceOutput"
+                            }
+                        ],
+                        "inputArtifacts": [
+                            {
+                                "name": "AppSource"
+                            },
+                            {
+                                "name": "ConfigSource"
+                            }
+                        ],
+                        "region": "ap-northeast-2"
+                    }
+                ]
+            }
+        ],
+        "version": 6
+    }
+}
