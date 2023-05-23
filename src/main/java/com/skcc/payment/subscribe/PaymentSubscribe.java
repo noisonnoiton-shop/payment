@@ -1,6 +1,6 @@
 package com.skcc.payment.subscribe;
 
-import com.amazonaws.xray.spring.aop.XRayEnabled;
+// import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.skcc.order.event.message.OrderEvent;
 import com.skcc.payment.event.channel.PaymentInputChannel;
 import com.skcc.payment.service.PaymentService;

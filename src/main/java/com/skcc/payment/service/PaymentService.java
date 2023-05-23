@@ -3,7 +3,7 @@ package com.skcc.payment.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.amazonaws.xray.spring.aop.XRayEnabled;
+// import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.skcc.order.event.message.OrderEvent;
 import com.skcc.payment.domain.Payment;
 import com.skcc.payment.event.message.PaymentEvent;
